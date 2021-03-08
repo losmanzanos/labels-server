@@ -44,24 +44,31 @@ app.get("/", (req, res) => {
 app.post("/images", requireAuth, async (req, res) => {
   try {
     const { imageURL } = req.body;
+    console.log(imageURL);
     const newImageURL = await pool.query(
       "INSERT INTO images (url, user_id) VALUES ($1, $2) RETURNING *",
       [imageURL, req.user.id]
     );
 
+    console.log(newImageURL);
+
     res.json(newImageURL.rows[0]);
   } catch (err) {
     console.error(err.message);
+    res.status(500).json(err);
   }
 });
 
 //Get ALL ImageURLs
 app.get("/images", requireAuth, async (req, res) => {
   try {
+    console.log("Hello!");
     const allImages = await pool.query(
       "SELECT * FROM images where user_id = $1",
       [req.user.id]
     );
+
+    console.log(allImages);
 
     res.json(allImages.rows);
   } catch (err) {
