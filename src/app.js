@@ -3,13 +3,13 @@ const app = express();
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const cors = require("cors");
-const pool = require("../db");
 const path = require("path");
 const PORT = process.env.PORT || 9001;
 const uploadImage = require("../helpers/helpers");
 const authRouter = require("./auth/auth-router");
 const usersRouter = require("./users/users-router");
 const { requireAuth } = require("./middleware/jwt-auth");
+const { pbkdf2 } = require("crypto");
 
 const multerMid = multer({
   storage: multer.memoryStorage(),
@@ -45,7 +45,8 @@ app.post("/images", requireAuth, async (req, res) => {
   try {
     const { imageURL } = req.body;
     console.log(imageURL);
-    const newImageURL = await pool.query(
+    const db = req.app.get("db");
+    const newImageURL = await db.raw(
       "INSERT INTO images (url, user_id) VALUES ($1, $2) RETURNING *",
       [imageURL, req.user.id]
     );
@@ -63,10 +64,10 @@ app.post("/images", requireAuth, async (req, res) => {
 app.get("/images", requireAuth, async (req, res) => {
   try {
     console.log("Hello!");
-    const allImages = await pool.query(
-      "SELECT * FROM images where user_id = $1",
-      [req.user.id]
-    );
+    const db = req.app.get("db");
+    const allImages = await db.raw("SELECT * FROM images where user_id = $1", [
+      req.user.id,
+    ]);
 
     console.log(allImages);
 
@@ -80,9 +81,8 @@ app.get("/images", requireAuth, async (req, res) => {
 app.get("/images/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const imageURL = await pool.query("SELECT * FROM images WHERE id = $1", [
-      id,
-    ]);
+    const db = req.app.get("db");
+    const imageURL = await db.raw("SELECT * FROM images WHERE id = $1", [id]);
     res.json(imageURL);
   } catch (err) {
     console.error(err.message);
@@ -94,10 +94,10 @@ app.get("/images/:id", async (req, res) => {
 app.delete("/images/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteImageURL = await pool.query(
-      "DELETE FROM images WHERE id = $1",
-      [id]
-    );
+    const db = req.app.get("db");
+    const deleteImageURL = await db.raw("DELETE FROM images WHERE id = $1", [
+      id,
+    ]);
 
     res.json("Image URL was deleted...");
   } catch (err) {
@@ -109,7 +109,8 @@ app.delete("/images/:id", async (req, res) => {
 app.post("/features", async (req, res) => {
   try {
     const { imageURL, features } = req.body;
-    const selectImageURL = await pool.query(
+    const db = req.app.get("db");
+    const selectImageURL = await db.raw(
       "SELECT id FROM images WHERE url = $1",
       [imageURL]
     );
@@ -120,7 +121,8 @@ app.post("/features", async (req, res) => {
     for (i = 0; i < features.length; i++) {
       const label = features[i].label;
       const language = features[i].languageCode;
-      const newImageURL = await pool.query(
+      const db = req.app.get("db");
+      const newImageURL = await db.raw(
         "INSERT INTO features (label, language, image_id, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
         [label, language || "Language not found", image_id, user_id]
       );
@@ -160,7 +162,8 @@ app.use((err, req, res, next) => {
 app.get("/features/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const imageURL = await pool.query(
+    const db = req.app.get("db");
+    const imageURL = await db.raw(
       "SELECT * FROM features WHERE image_id = $1",
       [id]
     );
