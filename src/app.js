@@ -47,7 +47,7 @@ app.post("/images", requireAuth, async (req, res) => {
     console.log(imageURL);
     const db = req.app.get("db");
     const newImageURL = await db.raw(
-      "INSERT INTO images (url, user_id) VALUES ($1, $2) RETURNING *",
+      "INSERT INTO images (url, user_id) VALUES (?, ?) RETURNING *",
       [imageURL, req.user.id]
     );
 
@@ -65,7 +65,7 @@ app.get("/images", requireAuth, async (req, res) => {
   try {
     console.log("Hello!");
     const db = req.app.get("db");
-    const allImages = await db.raw("SELECT * FROM images where user_id = $1", [
+    const allImages = await db.raw("SELECT * FROM images where user_id = ?", [
       req.user.id,
     ]);
 
@@ -82,7 +82,7 @@ app.get("/images/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const db = req.app.get("db");
-    const imageURL = await db.raw("SELECT * FROM images WHERE id = $1", [id]);
+    const imageURL = await db.raw("SELECT * FROM images WHERE id = ?", [id]);
     res.json(imageURL);
   } catch (err) {
     console.error(err.message);
@@ -95,7 +95,7 @@ app.delete("/images/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const db = req.app.get("db");
-    const deleteImageURL = await db.raw("DELETE FROM images WHERE id = $1", [
+    const deleteImageURL = await db.raw("DELETE FROM images WHERE id = ?", [
       id,
     ]);
 
@@ -110,10 +110,9 @@ app.post("/features", async (req, res) => {
   try {
     const { imageURL, features } = req.body;
     const db = req.app.get("db");
-    const selectImageURL = await db.raw(
-      "SELECT id FROM images WHERE url = $1",
-      [imageURL]
-    );
+    const selectImageURL = await db.raw("SELECT id FROM images WHERE url = ?", [
+      imageURL,
+    ]);
 
     const image_id = selectImageURL.rows[0].id;
     const user_id = 1; //req.user.id
@@ -123,7 +122,7 @@ app.post("/features", async (req, res) => {
       const language = features[i].languageCode;
       const db = req.app.get("db");
       const newImageURL = await db.raw(
-        "INSERT INTO features (label, language, image_id, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
+        "INSERT INTO features (label, language, image_id, user_id) VALUES (?, ?, ?, ?) RETURNING *",
         [label, language || "Language not found", image_id, user_id]
       );
     }
@@ -163,10 +162,9 @@ app.get("/features/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const db = req.app.get("db");
-    const imageURL = await db.raw(
-      "SELECT * FROM features WHERE image_id = $1",
-      [id]
-    );
+    const imageURL = await db.raw("SELECT * FROM features WHERE image_id = ?", [
+      id,
+    ]);
 
     res.json(imageURL.rows);
   } catch (err) {
