@@ -18,7 +18,9 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "knex": "^0.95.1",
     "multer": "^1.4.2",
+    "postgrator": "^4.1.1",
     "xss": "^1.0.8"
   }
 }
