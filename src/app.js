@@ -76,8 +76,10 @@ app.get("/images/:id", async (req, res) => {
     const imageURL = await pool.query("SELECT * FROM images WHERE id = $1", [
       id,
     ]);
+    res.json(imageURL);
   } catch (err) {
     console.error(err.message);
+    res.status(500).json(err);
   }
 });
 
