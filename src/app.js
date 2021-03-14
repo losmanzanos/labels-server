@@ -78,7 +78,7 @@ app.get("/images", requireAuth, async (req, res) => {
 });
 
 //Get an ImageURL by ID
-app.get("/images/:id", async (req, res) => {
+app.get("/images/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const db = req.app.get("db");
@@ -91,7 +91,7 @@ app.get("/images/:id", async (req, res) => {
 });
 
 //Delete an ImageURL
-app.delete("/images/:id", async (req, res) => {
+app.delete("/images/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const db = req.app.get("db");
@@ -106,7 +106,7 @@ app.delete("/images/:id", async (req, res) => {
 });
 
 //Get ALL Features by Image ID
-app.post("/features", async (req, res) => {
+app.post("/features", requireAuth, async (req, res) => {
   try {
     const { imageURL, features } = req.body;
     const db = req.app.get("db");
@@ -134,7 +134,7 @@ app.post("/features", async (req, res) => {
 });
 
 //Upload Image to Firebase
-app.post("/uploads", async (req, res, next) => {
+app.post("/uploads", requireAuth, async (req, res, next) => {
   try {
     const myFile = req.file;
     const imageUrl = await uploadImage(myFile);
@@ -158,7 +158,7 @@ app.use((err, req, res, next) => {
 });
 
 //Get a Feature by ID
-app.get("/features/:id", async (req, res) => {
+app.get("/features/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const db = req.app.get("db");
