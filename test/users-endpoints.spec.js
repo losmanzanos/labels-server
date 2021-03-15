@@ -48,7 +48,7 @@ describe("Users Endpoints", function () {
         });
       });
 
-      it(`responds 400 'Password must be longer than 8 characters' when empty password`, () => {
+      it(`responds 400 'Password must be longer than 8 characters.' when empty password`, () => {
         const userShortPassword = {
           user_name: "test user_name",
           password: "1234567",
@@ -57,10 +57,10 @@ describe("Users Endpoints", function () {
         return supertest(app)
           .post("/users")
           .send(userShortPassword)
-          .expect(400, { error: `Password must be longer than 8 characters` });
+          .expect(400, { error: `Password must be longer than 8 characters.` });
       });
 
-      it(`responds 400 'Password must be less than 72 characters' when long password`, () => {
+      it(`responds 400 'Password must be less than 72 characters.' when long password`, () => {
         const userLongPassword = {
           user_name: "test user_name",
           password: "*".repeat(73),
@@ -69,10 +69,10 @@ describe("Users Endpoints", function () {
         return supertest(app)
           .post("/users")
           .send(userLongPassword)
-          .expect(400, { error: `Password must be less than 72 characters` });
+          .expect(400, { error: `Password must be less than 72 characters.` });
       });
 
-      it(`responds 400 error when password starts with spaces`, () => {
+      it(`responds 400 error when password starts with spaces.`, () => {
         const userPasswordStartsSpaces = {
           user_name: "test user_name",
           password: " 1Aa!2Bb@",
@@ -82,11 +82,11 @@ describe("Users Endpoints", function () {
           .post("/users")
           .send(userPasswordStartsSpaces)
           .expect(400, {
-            error: `Password must not start or end with empty spaces`,
+            error: `Password must not start or end with empty spaces.`,
           });
       });
 
-      it(`responds 400 error when password ends with spaces`, () => {
+      it(`responds 400 error when password ends with spaces.`, () => {
         const userPasswordEndsSpaces = {
           user_name: "test user_name",
           password: "1Aa!2Bb@ ",
@@ -96,7 +96,7 @@ describe("Users Endpoints", function () {
           .post("/users")
           .send(userPasswordEndsSpaces)
           .expect(400, {
-            error: `Password must not start or end with empty spaces`,
+            error: `Password must not start or end with empty spaces.`,
           });
       });
 
@@ -110,11 +110,11 @@ describe("Users Endpoints", function () {
           .post("/users")
           .send(userPasswordNotComplex)
           .expect(400, {
-            error: `Password must contain at least one upper case letter, one lower case letter, one number and one special character`,
+            error: `Password must contain at least one upper case letter, one lower case letter, one number, and one special character.`,
           });
       });
 
-      it(`responds 400 'Username already taken' when user_name isn't unique`, () => {
+      it(`responds 400 'Username already taken.' when user_name isn't unique`, () => {
         const duplicateUser = {
           user_name: testUser.user_name,
           password: "11AAaa!!",
@@ -123,7 +123,7 @@ describe("Users Endpoints", function () {
         return supertest(app)
           .post("/users")
           .send(duplicateUser)
-          .expect(400, { error: `Username already taken` });
+          .expect(400, { error: `Username already taken.` });
       });
     });
 
